@@ -1,0 +1,117 @@
+---
+title: "TAX_AGG cheat sheet"
+output: html_notebook
+---
+
+## How TAXIZE can help with VEGAN work and analysis of co-occurrence data
+
+The little example below borrows a data set used in the VEGAN tutorial, to demonstrate an excellent tool within the TAXIZE package that can allow a shift in perspective at a matrix of "sites" (lists) and taxa -- allowing the analyst to look at the level of species, or at the level of genera or families, etc).
+
+To "collapse" a data set to the level of genus or to the level of family is called "taxonomic aggregation" and it's exactly what the tax_agg function in TAXIZE can accomplish, as shown by the mini-example here.
+
+First, the tutorial for tax_agg uses the same sample file that's used for VEGAN, so it should be in your library already. Load the VEGAN library and that data file
+
+```{r}
+library(taxize)
+library(vegan)
+library(readr)
+data(dune)                         
+head(dune)
+```
+
+To demonstrate simply, let's focus on just three columns:  in column 6 we find Bellpere (Bellis perennis, daisy) in columns 16 and 17 are two species called Juncarti and Juncbufo (Juncus articulatus and Juncus bufonius; both are rushes).  (Look these cute plants up in EOL!)
+
+If we were reading the whole file, we would need to omit the first column with the site names. That line is below, commented out. 
+
+For the mini-example, we specify just three columns (6, 16:17)
+
+```{r}
+df<- dune[ , c(2:30)]
+df <-dune[ , c(6,16:17)]
+colnames(df)<- c("Bellis perennis","Juncus articulatus", "Juncus bufonius")
+df
+```
+
+Notice we had to re-name the column headings so that they are in proper Latin binomial form. 
+
+Not to aggregate to the level of family requires not just grouping species into their correct families. It also requires combining the data in the middle and right hand column. If you scroll through file from above, you'll see that we want to sum the data in lines 7 and 9, where the two Juncus species co-occur. (It will be done in all rows of the data set, but in all the other rows there is at least one zero so the summing is trivial.)
+
+This may seem simple, but think what TAXIZE is accomplishing for us behind the scenes:
+
++ figuring out which species belong in which families ("resolving")
++ assigning them to those families (reassigning)
++ summing data about frequency when there are multiple taxa co-occurring within any given site
+
+```{r}
+agg<-tax_agg(df, rank ='family',db = 'itis', rows=1)
+agg
+agg$x
+```
+
+This could come in quite handly for folks wanting to work more with VEGAN in future projects!
+
+#### MINI-EXERCISES
+
+Use the tax_agg for the list of ten lists compiled during our session on March 1. 
+
+Unusually here, we are opening the file using read_csv rather than the more usual read.csv
+
+That command is enabled through the package READR. (See library being loaded above; you may need to install this package.)
+
+```{r}
+ten<-read_csv("TenListsMatrix_fn5.csv")
+ten
+```
+The code below can help you look at the whole list of Latin binomial species names (which are in the column headings, so you could also look at them by scrolling across).
+```{r}
+colnames(ten)
+```
+
+This code will now aggregate the species-level list and information (which is about frequency of each taxon) with the family-level list. Clearly this could be aggregated instead at the level of genus or order. 
+```{r}
+ten <-ten[ , c(2:215)]
+agg_ten_fam<-tax_agg(ten, rank = "family",db = 'both', row=1)
+agg_ten_fam
+agg_ten_fam$x
+```
+```{r}
+ten<-read_csv("TenListsMatrix_fn5.csv")
+ten
+```
+
+
+db
+
+```{r}
+synonyms("Echinocereus aguirre", db="eol")
+```
+
+
+```{r}
+upstream("Pinus contorta", db = 'col', upto = 'genus')
+```
+
+```{r}
+out<-classification(c("Pinus contorta","Arabidopsis thaliana", "Fraxinus americana"), db = 'gbif', verbose=FALSE)
+out
+```
+
+
+
+```{r}
+tax<-taxonomy(Pinus, arabidopsis, fraxinus)
+```
+
+```{r}
+hier<- tax_name(query = "Helianthus annuus", get = "family", db = "itis", row=1)
+hier
+```
+
+
+
+```{r}
+ten <-ten[ , c(2:215)]
+agg_ten<-tax_agg(ten, rank = "order",db = 'ncbi')
+agg_ten
+agg_ten$x
+```

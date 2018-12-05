@@ -1,0 +1,421 @@
+---
+title: "Co-occurring biodiversity: learning and adapting methods for analyzing community composition"
+output: html_notebook
+---
+
+It's occurring to me that R Notebooks really are R Cookbooks, and somewhat like recipes. I've put an overview to help remind you of the content of the notebook, and also how it was used in our class session and how to use it again to complete a portfolio assignment. (You'll want to re-name and adapt for your purposes, and for turning in.)
+This R Notebook multiple parts:
+
+## A prelude was to get lists of plants names. 
+
++ HOW TO GET TEXTBOOK LISTS FROM GLOBAL NAME FINDER AND CHECK WITH GLOBAL NAMES RESOLVER
++ http://globalnames.org/
+
+
++ ALSO ASSEMBLED LISTS FROM '50 PLANTS' EXERCISE, INSPIRED BY BOOK BY HARRIS
++ https://www.nybg.org/blogs/plant-talk/2017/06/from-the-library/what-have-plants-ever-done-for-us/
+
+## Earning Portfolio points
+
+Please contribute at least one new file of a textbook list, and combine it with lists already put together. You will want to add it to your working directory, and upload it with your completed workbook. (You were assigned one at our trip to NYBG/Mertz. If it's already here, choose another book from the BHL and go through the Global Names finder and resolver process.) 
+
+Alternatively, or in addition, add one new files from the '50 Plants' list if yours was not already included. Then, incompleting your work below, combine the new list with the other existing lists.
+
+
+You'll recall and see that new R Packages VEGAN and LABDSV were done with examples, from the 50_Plants project.  
+
+If you instead want to work with a set of lists from textbooks, you'll want to adapt the code for that purpose. If you scroll to the bottom of the notebook you'll see some info.
+
+Sorry for the glitch during lab session, but this code should work if the right libraries are loaded. 
+
+IT IS VERY IMPORTANT to have the necessary files in your working directory as you work. 
+
+As usual, remember to install needed packages into your R studio if you haven't already, but if they are installed you're all set. Later, if you return to this notebook, you do not need to re-install them but need to call the package into R Studio using the "library" command.(Add # in front of lines to 'comment them out') 
+
+
+## How to install the packages, and loading into your library
+
+```{r}
+#Make sure to install these packages, which you can do by removing the "#" before the intall.packages commands. After you've installed once, you can put the "#" back ("comment them out") and in the future simply load the package from your library rather than re-install
+#install.packages("vegan")
+#install.packages("labdsv")
+library("plyr")
+#do not install package "dplyr" - it will cause conflict and code won't run properly!
+library("vegan")
+library("labdsv")
+```
+
+The first demonstration of this package will use the data from our "50 Plants project" from the first day of class. There are ten files in the Folder in Canvas for today's class, and you can copy one or more of them into your working directory. There are four other files that come from finding taxon names in historical textbooks. 
+
+As a follow-up, you can also use this package to analyze data scraped out of field guides and textbooks, and there is some example code at the bottom for doing that. 
+
+You may want to hop over to Excel to open each of the files to inspect how they're formatted. In converting common names into species names, I also homogenized many vague names, typically using the book by Harris "What Have Plants Done for Us?" or Wikipedia. For example, when a person wrote "grass" that was converted to Poa pratensis which is what Harris uses (and equates with a European native grass called Poa pratensis, now also naturalized in North America.) Another example is that when a person wrote "oak" that was converted not just to the genus Quercus but to the specific species Quercus rubra which is the Northern red oak and the keystone tree in most forests in the New York Metro area. 
+
+Below, you'll see a line that reads the file from the directory and names it so that R Studio can work with it. 
+
+Next, the function "count" is used to create a table listing all the species present. (Later in this Notebook, you will learn a similar function "table" and some of its properties.) 
+
+Then, using some skills that were demonstrated during our first lab, the table is manipulated in three ways: (1) its re-named, (2) it is turned into a data.frame and (3) it has a new first column added, which identifies the table internally (in addition to it being identified by its name). 
+
+The result is a file inside of R Studio with a name and a  total of three columns. 
+
+As a last step, using skills from our first lab, the names at the top of the three columns are changed. 
+
+Below, I have code for ten of these files. I welcome and encourage you to add an eleventh file (or more) and modify everything below accordingly. (It's not that tricky, and will help you feel confident that you understand the steps and the workflow.)
+```{r}
+#importing files for 50Plants project
+#GOOD CODE
+#importing multiple files means needing to keep track of file names externally (in #the working directory and how to name them once they are called into R Studio. I #used the following
+#callahan Callahan50.csv
+#gershberg Gershberg50.csv
+#clare Clare50.csv
+#vivian Vivian50.csv
+#jenna Jenna50.csv
+#harris Harris50. csv
+#meaghan Meaghan50.csv
+#carolyn Carolyn50.csv
+#julia Julia50.csv
+#izzy Izzy50.csv
+harris<-read.csv("Harris50.csv")
+#read the file
+Har50=count(harris, "Latin.Binomial.Name")
+Har50
+#This is a table that lists all rows and how often each unique name appears, which is exactly one. Later, when we compile multiple lists, you'll see why this is useful.
+Har50<-data.frame("harris", Har50[,1:2])
+#In addition to turning this table into a data.frame, it also adds a column identifying the list. Again, this will be useful later when combining multiple lists. 
+names(Har50)<-c("ListID", "SpeciesID", "Freq")
+#This re-names the three columns in the list
+Har50
+```
+
+
+By editing/adapting the code above, try creating or five lists that are all formatted the same. 
+
+The next step is to combine/compile these lists into one big file. (Below, you'll see that I did all ten, so adjust your code accordingly.)
+
+Again, harking back to our first lab, you can combine files if the columns line up using "rbind".
+
+I did this using a total of ten files and wound up with a file with close to 500 lines. 
+
+As mentioned above, it would be great if you can add additional files to these ten and do a similar analysis. 
+```{r}
+#names of raw files
+#Cal50
+#Ger50
+#Cla50
+#Viv50
+#Jen50
+#Har50
+#Meg50
+#Car50
+#Jul50
+#Izz50
+#names of raw files
+#AL
+#MN
+#EB
+#EG
+#AP
+ten<-rbind(Cal50, Ger50, Jul50, Har50, Cla50, Mea50, Viv50, Jen50, Car50, Izz50)
+head(ten)
+tail(ten)
+ten
+#wauthors<-rbind(AL, MN, EB, EG, AP)
+#head(wauthors)
+#tail(wauthors)
+```
+
+
+I'm going to export my file of ten lists just so that I can avoid re-compiling in future.
+
+```{r}
+write.csv(ten, file="TenLists_fn4.csv")
+```
+
+The code for reading the compiled list, just written with the chunk above to the working directory:
+
+
+```{r}
+ten<-read.csv("TenLists_fn4.csv")
+ten
+#to drop the unneeded and incompatible first column that is just an index column from the file
+ten<-ten[,2:4]
+head(ten)
+```
+
+I then wanted to turn this into a matrix that has a list of all the species as the columns, and a list of all the lists as the rows. Each entry in this speciesxlist matrix needs to have an entry. If the species is not on the list, then the entry should be zero. If the species is present on the list, then the entry should indicate its presence (presence = 1 as compared to absence = 0). In other types of community composition data, it's possible to have abundance as a number as compared to absence as zero. 
+
+What's fantastic is that the package LABDSV has a wonderful function called "matrify" that can do this in one step. To make it work, the compiled data needed to be formatted as above. The first column identifies the list (or the location where the data came from, sometimes referred to as a "vegetation plot" or a "forest stand"). The second column has the names of the taxa. The third column has the abundance data, which in our case is presence-absence data. (Remember how I used the count function when I imported the first individual list? And it simply entered a count of 1 for all elements on the list? That was important to make it possible to use this matrify function.)
+
+So, the code below takes the file compiled above, runs it through matrify and gives it a new name, and then coerces it to be a matrix (with the same name).
+
+If you expand to include more than ten lists (or "sites") then modify accordingly.
+
+Once again, I am also going to export the file to avoid re-making it in the future. 
+
+```{r}
+ListData<-matrify(ten)
+ListData<-as.matrix(ListData)
+ListData
+#AuthorData<-matrify(wauthors)
+#AuthorData<-as.matrix(AuthorData)
+#AuthorData
+```
+
+If you wanted to save this file:
+
+```{r}
+write.csv(ListData, file="TenListsMatrix_fn5.csv")
+```
+
+## After you have a matrix: diversity indices, ordinations and ordination plotting
+
+What can we do with this big matrix? For starters, we can use an index to measure the similarity (or dissimilarity) of any two pairs of lists in the matrix
+
+There are many different ways to measure community similarity or dissimilarity. 
+A simple pairwise index is called Jaccard's Coefficient of similarity, J. 
+
+J = a / (n - d)
+
+where a is the number of "positive matches" (+ +, species found in two lists), d is the number of negative matches (- - , species found in neither list) and n is the total number of possible matches (based on the total number of taxa found across all lists). 
+
+Consider this simple example: 
+
+                 List 1             List 2
+Banana	           X	                X
+Apple	             X	
+Orange	           X	                X
+Grapefruit		
+Lemon		
+Kiwi	             X	
+Lettuce	           X	
+Onion	             X	                X
+Garlic	           X	                X
+Potato		                            X
+
+in which a = 4, d = 2, n = 10
+
+so J  =  4 / (10 - 2) = 0.5 
+
+This index will vary between zero and one. 
+
+There are many other ways to measure pair-wise similarities. 
+
+If there are more than two lists, it's possible to put together a matrix of pair-wise values for the index, which is what the code below does. 
+
+In addition, the code below can be used to look at variation in all the pairwise values. 
+
+```{r}
+#par(mfrow = c(1, 2))
+jaccard = vegdist(ListData, "jaccard")
+jaccard
+#bray = vegdist(ListData, "bray") 
+#bray
+#gower = vegdist(dune, "gower")
+hist(jaccard, xlim = range(0.0,1.0))
+#hist(bray, xlim = range(0.0,1.0))
+#hist(gower, xlim = range(0.0,1.0))
+```
+
+
+Another thing to compare among such lists of species diversity are things like the Simpson diversity index or Shannon diversity index. Because we are working with lists that come out of people's heads and not out of nature, they are completely un-natural and artificial. In particular, each species occurs only once on the list, and the lists are supposed to be lists of 50 species. 
+
+The Simpson index is based on the probability of drawing two individuals from a sample and them both being the same species (which is vanishingly small for us). The index is one minus this probability. The shannon index is based on a log scale and will approach zero if all the members of the sample are the same species, which is the opposite of our lists. Instead, in our lists each species is represented just once, and the index reaches a maximum value, and the exact magnitude of that value is related to the number of species on the list. (There is a little bit of variation because some people had fewer than 50 taxa on the list.) You can read about these indices on Wikipedia, among other sites. 
+
+```{r}
+(simpson<-diversity(ListData, index = "simpson"))
+(shannon<-diversity(ListData, index = "shannon"))
+par(mfrow = c(1, 2))  # use par to generate panels with 1 row of 2 graphs
+hist(simpson)
+hist(shannon)
+```
+
+
+
+```{r}
+#example_NMDS=metaMDS(ListData, k = 2) # Our community-by-species matrix 
+# K=2 is setting the number of reduced dimensions. Increase if high stress is problem. 
+#"The stress, or the disagreement between 2-D configuration and predicted values from the regression"
+
+#A good rule of thumb: stress > 0.05 provides an excellent representation in reduced dimensions, > 0.1 is great, >0.2 is good/ok, and stress > 0.3 provides a poor representation
+
+plot(example_NMDS)
+test.plot<-ordiplot(example_NMDS,type="n") #Ordination plot function especially for congested plots
+points(test.plot, "species", pch=21, col="red", bg="yellow")
+
+test.plot<-ordiplot(example_NMDS,type="n") #Ordination plot function especially for congested plots
+points(test.plot, "sites", col="blue", cex=0.9)
+
+test.plot<-ordiplot(example_NMDS,type="n") #Ordination plot function especially for congested plots
+points(test.plot, "species", pch=21, col="red", bg="yellow")
+text(test.plot, "sites", col="blue", cex=0.9)
+
+test.plot<-ordiplot(example_NMDS,type="n") #Ordination plot function especially for congested plots
+text(test.plot, "species", pch=21, col="red", bg="yellow")
+points(test.plot, "sites", col="blue", cex=0.9)
+
+# 
+#ordiplot(example_NMDS,type="n", display="sites") #Ordination plot function especially for congested plots
+#ordiplot(example_NMDS,type="n", display="species") #Ordination plot function especially for congested plots
+```
+
+```{r}
+#The function adds text or points to ordination plots; lists only
+#Sites only
+plot(example_NMDS)
+
+ordiplot(example_NMDS,type="n") #Ordination plot function especially for congested plots
+orditorp(example_NMDS,display="sites",cex=1.25,air=0.01)
+#species only
+ordiplot(example_NMDS,type="n") #Ordination plot function especially for congested plots
+orditorp(example_NMDS,display="species",col="red",air=0.01) 
+
+#Text for Species and sites together
+ordiplot(example_NMDS,type="n") #Ordination plot function especially for congested plots
+orditorp(example_NMDS,display="species",col="red",air=0.01) 
+orditorp(example_NMDS,display="sites", cex=1.25,air=0.01)
+```
+
+
+
+```{r}
+treat=c(rep("Treatment1",1),rep("Treatment2",1), rep("Treatment1", 3), rep("Treatment2", 5))
+ordiplot(example_NMDS,type="n")
+#orditorp(example_NMDS,display="species",col="red",air=0.01)
+#ordispider(example_NMDS,groups=treat, lwd=3)
+#orditorp(example_NMDS,display="sites",col=c(rep("green",1),rep("blue",1), rep("green", 3), rep("blue", 5)), air=0.01,cex=1.25)
+
+
+
+test.plot<-ordiplot(example_NMDS,type="n") #Ordination plot function especially for congested plots
+points(test.plot, "species", pch=21, col="red", bg="yellow")
+ordispider(example_NMDS,groups=treat, lwd=3)
+text(test.plot, "sites", col=c(rep("green",1),rep("blue",1), rep("green", 3), rep("blue", 5)), cex=0.9)
+
+
+
+```
+```{r}
+treat=c(rep("Treatment1",1),rep("Treatment2",1), rep("Treatment1", 3), rep("Treatment2", 5))
+ordiplot(example_NMDS,type="n")
+orditorp(example_NMDS,display="species",col="red",air=0.01)
+ordiellipse(example_NMDS,groups=treat, lwd=2, col=c(rep("green",1),rep("blue",1), rep("green", 3), rep("blue", 5)))
+orditorp(example_NMDS,display="sites",col=c(rep("green",1),rep("blue",1), rep("green", 3), rep("blue", 5)), air=0.01,cex=1.25)
+```
+
+
+```{r}
+treat=c(rep("Treatment1",1),rep("Treatment2",1), rep("Treatment1", 3), rep("Treatment2", 5))
+ordiplot(example_NMDS,type="n")
+orditorp(example_NMDS,display="species",col="red",air=0.01)
+ordiellipse(example_NMDS,groups=treat, lwd=2, col=c(rep("green",1),rep("blue",1), rep("green", 3), rep("blue", 5)))
+orditorp(example_NMDS,display="sites",col=c(rep("green",1),rep("blue",1), rep("green", 3), rep("blue", 5)), air=0.01,cex=1.25)
+```
+
+
+## Another type of data: lists of species from textbooks
+
+The files for four books are already processed and could be used to practice doing more of this type of work. 
+
+
+
+```{r}
+#GOOD CODE - to work with lists from Global Names Finder
+#You can get these files from CANVAS
+#You can adapt this code if you want to contribute one or more books.
+brightwen<-read.csv("BrightwenGlimpses.csv")
+EB<-as.data.frame(table(brightwen))
+EB
+EB<-data.frame("Brightwen", EB[,1:2])
+names(EB)<-c("PlotID", "TaxonID", "Freq")
+EB
+write.csv(EB, "BrightwenList.csv")
+```
+
+
+```{r}
+#importing files from file obtained via Global Names 
+#GOOD CODE
+pratt<-read.csv("PrattWildflowers.csv")
+AP<-as.data.frame(table(pratt))
+AP<-data.frame("Pratt", AP[,1:2])
+names(AP)<-c("PlotID", "TaxonID", "Freq")
+AP
+
+```
+
+
+```{r}
+#GOOD CODE
+gregory<-read.csv("GregoryAnatomy.csv")
+EG<-as.data.frame(table(gregory))
+EG<-data.frame("Gregory", EG[,1:2])
+names(EG)<-c("PlotID", "TaxonID", "Freq")
+EG
+write.csv(EG, "GregoryList.csv")
+```
+
+
+```{r}
+#GOOD CODE
+north<-read.csv("NorthRecollections.csv")
+MN<-as.data.frame(table(north))
+MN<-data.frame("North", MN[,1:2])
+names(MN)<-c("PlotID", "TaxonID", "Freq")
+MN
+```
+
+
+```{r}
+#GOOD CODE
+lincoln<-read.csv("LincolnFamiliar.csv")
+AL<-as.data.frame(table(lincoln))
+AL<-data.frame("Lincoln", AL[,1:2])
+names(AL)<-c("PlotID", "TaxonID", "Freq")
+AL
+```
+
+```{r}
+#names of raw files
+#AL
+#MN
+#EB
+#EG
+#AP
+wauthors<-rbind(AL, MN, EB, EG, AP)
+head(wauthors)
+tail(wauthors)
+#ten<-rbind(Cal50, Ger50, Jul50, Har50,Cla50, Viv50, Jen50,  Mea50, Car50, Izz50)
+#head(ten)
+#tail(ten)
+```
+
+
+If you go back to the demonstrations above, you'll see that you can use similar code to "row bind" all of these files together, and then to use the "matrify" function to create a matrix that can be used in examining diversity indices (shannon, simpson); pairwise dissimilarity or distance indices and matrices filled with these pairwise indices (jaccard, gower); and to run an ordination such as a metaMDS that can then be plotted.
+
+Work through these all to feel more confident that you understand the code for the individual steps and the workflow. 
+
+I've skipped over a bunch of steps but left in a late step, which is doing the metaMDS estimation from a community-by-species matrix and saving it, then making a basic plot of it. I also have skipped over figuring out ways to display the plot differently, such as by using names of species or books, color-coding, etc.
+
+
+```{r}
+books_NMDS=metaMDS(AuthorData, k = 2) # Our community-by-species matrix 
+# K=2 is setting the number of reduced dimensions. Increase if high stress is problem. 
+#"The stress, or the disagreement between 2-D configuration and predicted values from the regression"
+
+#A good rule of thumb: stress > 0.05 provides an excellent representation in reduced dimensions, > 0.1 is great, >0.2 is good/ok, and stress > 0.3 provides a poor representation
+
+plot(books_NMDS)
+```
+ordiplot(books_NMDS,type="n") #Ordination plot function especially for congested plots
+```
+#The function adds text or points to ordination plots; species only
+orditorp(books_NMDS,display="species",col="red",air=0.01) 
+#Sites only
+ordiplot(books_NMDS,type="n") #Ordination plot function especially for congested plots
+orditorp(books_NMDS,display="sites",cex=1.25,air=0.01)
+#Species and sites together
+ordiplot(books_NMDS,type="n") #Ordination plot function especially for congested plots
+orditorp(books_NMDS,display="species",col="red",air=0.01) 
+orditorp(books_NMDS,display="sites",cex=1.25,air=0.01)
+

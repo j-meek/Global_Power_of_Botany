@@ -1,0 +1,213 @@
+---
+title: "Resolving Lists of  Names: On-line Resources & TAXIZE"
+output: html_notebook
+---
+
+
+## Overview: a catalog of on-line catalogues
+
+This notebook rounds up information about a lot of different on-line resources to obtain biodiversity data. They are united by relying on names of taxa, always a struggle because different people and projects all use different solutions. 
+
+We've discussed how Wikipedia is somewhat helpful, even quite helpful. One of the most important projects in plant science, the Angiosperm Phylogeny Group, actually integrates a lot of its work with Wikipedia in addition to maintaining their own pages through the Missouri Botanical Garden:
+
+https://en.wikipedia.org/wiki/APG_IV_system
+https://en.wikipedia.org/wiki/Angiosperm_Phylogeny_Group
+
+http://www.mobot.org/MOBOT/research/APweb/
+
+In previous digital labs, you've worked with GBIF, Open Tree of Life (OTOL), and I've also referred you to the Encyclopedia of Life and its Global Names Resolver:
+
+https://www.gbif.org/
+https://tree.opentreeoflife.org/opentree/argus/opentree9.1@ott93302
+http://eol.org/
+http://globalnames.org/
+http://resolver.globalnames.org/
+
+
+When we were at the NYBG learning about GIS and Plant Conservation issues, we also talked about the process of listing plants as threatened or endangered (the Red List) and therefore protectable under the Convention on International Trade in Endangered Species (CITES), and they have a database portal of their own
+
+http://www.iucnredlist.org/
+https://www.cites.org/eng
+https://www.speciesplus.net/
+
+Internationally, botanists rely on the International Plant Names Index and they collaboratively maintain theplantlist.org. And, within the U.S., the government  runs the Integrated Taxonomic Information Service. A related tool is the Catalog of Life, which is for all life.
+
+http://www.ipni.org/
+http://www.theplantlist.org/
+https://itis.gov/
+http://www.catalogueoflife.org/
+
+
+## R package TAXIZE
+
+If you haven't already install TAXIZE and load the library. You can see for yourself that it offers methods to use within an R Studio session -- everything from converting common names to scientific names (and vice versa), to looking up species in GBIF or on the RED LIST, to correcting spelling or other naming errors. 
+
+```{r}
+library("taxize")
+library("plyr")
+```
+
+#### Accessing some databases: examples 
+
+If you already have a Latin name that's spelled more or less correctly, you can do a few things. 
+
+First, you can check and possibly correct some minor errors using the Global Name Resolving Service.
+
+```{r}
+GH511 <- gnr_resolve(names = c("Nymphae odorata", "Amorphophallis", "Welwitchia"))
+GH511_list<-GH511[, c(1, 3)]
+GH511_list
+```
+
+With Latin binomials, you can go to work with many resources, including the fantastic Encyclopedia of Life, by going to EOL.org with your web browser. Or, access EOL from R. 
+
+First, you must go to the EOL.org webpage and create an account. Then, click on "PROFILE" in upper right and on 'edit my profile'. There, you'll see instructions for obtaining a personal API key. Once obtained, it will always be stored and cut-and-pastable from the API key window in the lower left. 
+
+
+```{r}
+eol_search(terms = c("Nymphaea", "Amorphophallus", "Welwitschia"), key = "cut-&-paste-your-API-key")
+```
+
+
+The command below, like many in TAXIZE, is interactive. When you run it, the Console window will show a list of possibilities. You can then go to that window, scroll through and choose, and then enter the number when prompted. The output will include, among other things, a link to see information about the taxon at EOL.org.
+
+```{r}
+get_eolid(c("Nymphaea", "Amorphophallus", "Welwitschia"), key = "cut-&-paste-your-API-key")
+```
+
+
+#### Common Names to Scientific Names and vice versa
+
+It's possible to use the ITIS database within R with commands such as what's below. This may be a little slow.
+
+
+```{r}
+#Here is a way to do it if you only have a few names
+comm2sci(commnames = c('coffee', 'hazelnut'), db = "itis")
+
+#You could instead use the three lines below to request and obtain many taxa 
+#in one query, saving it as a report. This might be a good idea if you want 
+#to make a request, walk away, and return later. You could also export
+#the report to read outside of R studio. 
+
+mylist<-c('hazelnut', 'olive')
+report<-comm2sci(commnames = mylist, db = "itis")
+report
+```
+
+The mapping from one common name is often to many different scientific names: not an easy task!
+
+By the way, you can go in the opposite direction, and it's just as difficult. Any given scientific name will have many different you'll need to work between this window and the console, because this feature is interactive and wants you to actively review output and make a choice.
+
+```{r}
+Latinlist = c('Corylus americana', 'Olea europaea')
+#sci2comm(scinames = c('Corylus americana', 'Olea europea'), db = 'itis')
+sci2comm(scinames = Latinlist, db = 'itis')
+```
+
+
+Many types of queries are interactive, by default. One like that is the function to get data from the gbif database. The first chunk of code is in interactive mode; the second gets all the output without being interactive. Do you see the difference in the two commands? 
+
+
+
+```{r}
+gbifids<-get_gbifid(Latinlist)
+```
+
+
+A simple change returns all the information, rather than working in interactive mode
+
+```{r}
+gbifids<get_gbifid_(Latinlist)
+gbifids
+```
+
+
+The code below gets TSNs - taxonomic serial numbers. 
+
+```{r}
+#interactive, if desired
+#tsns <- get_tsn(Latinlist)
+tsns <- get_tsn_(Latinlist)
+tsns
+```
+
+You can request a complete classification from these numeric TSN codes, which would be helpful if you wanted to know the family or larger clade.
+
+```{r}
+myclass<-classification(32990, db = 'itis')
+myclass
+```
+
+
+Too complicated? Then try EOL.org which is fantastic. Go make your account and get your API Key.
+
+
+
+## How TAXIZE can help with VEGAN work and analysis of co-occurrence data
+
+The little example below borrows a data set used in the VEGAN tutorial, to demonstrate an excellent tool within the TAXIZE package that can allow a shift in perspective at a matrix of "sites" (lists) and taxa -- allowing the analyst to look at the level of species, or at the level of genera or families, etc).
+
+To "collapse" a data set to the level of genus or to the level of family is called "taxonomic aggregation" and it's exactly what the tax_agg function in TAXIZE can accomplish, as shown by the mini-example here.
+
+First, the tutorial for tax_agg uses the same sample file that's used for VEGAN, so it should be in your library already. Load the VEGAN library and that data file
+
+```{r}
+library(vegan)
+data(dune)                         
+head(dune)
+```
+
+To demonstrate simply, let's focus on just three columns:  in column 6 we find Bellpere (Bellis perennis, daisy) in columns 16 and 17 are two species called Juncarti and Juncbufo (Juncus articulatus and Juncus bufonius; both are rushes).  (Look these cute plants up in EOL!)
+
+If we were reading the whole file, we would need to omit the first column with the site names. That line is below, commented out. 
+
+For the mini-example, we specify just three columns (6, 16:17)
+
+```{r}
+#df<- dune[ , c(2:30)]
+df <-dune[ , c(6,16:17)]
+colnames(df)<- c("Bellis perennis","Juncus articulatus", "Juncus bufonius")
+df
+```
+
+Notice we had to re-name the column headings so that they are in proper Latin binomial form. 
+
+Not to aggregate to the level of family requires not just grouping species into their correct families. It also requires combining the data in the middle and right hand column. If you scroll through file from above, you'll see that we want to sum the data in lines 7 and 9, where the two Juncus species co-occur. (It will be done in all rows of the data set, but in all the other rows there is at least one zero so the summing is trivial.)
+
+This may seem simple, but think what TAXIZE is accomplishing for us behind the scenes:
+
++ figuring out which species belong in which families ("resolving")
++ assigning them to those families (reassigning)
++ summing data about frequency when there are multiple taxa co-occurring within any given site
+
+```{r}
+agg<-tax_agg(df, rank ='family',db = 'ncbi')
+agg
+agg$x
+```
+
+This could come in quite handly for folks wanting to work more with VEGAN in future projects!
+
+#### MINI-EXERCISES
+
+Try these. Complete at least one by saving some output in your R Notebook, and also add some discussion about the output. In a lot of ways, 2 and 3 are easier than 1. All are essential to work with biodiversity data. 
+
+1. The folder for PF3 has a few scanned lists of animals from our 50_Plants and 50_Animals project. Or use a list that you obtained from a digitized botanical textbook. Divide the list up into 4 even portions. 
+
++ Resolve the first 25% using Google/Wikipedia searches
++ Resolve the next 25% using itis.org in a browser
++ Resolve the next 25%  using  comm2sci -- pass a vector of names to comm2sci, interactively
+
+Finish up the last 25% with whatever seems fastest. 
+
+Save your list in an Excel file in csv format. Also write some comments about why certain methods were faster or slower. 
+
+2. Use the tax_agg for the list of ten lists compiled during our session on March 1. What are the dimensions of the original matrix as compared to the "collapsed" matrix. (Usually one refers to  a site-by-taxon matrix having S sites and T taxa as an S-by-T matrix.)
+
+3. To help integrate this lesson in PF3 with work in PF4, take your matrix "collapsed" to just families, and use it to make a dissimilarity matrix and/or to do a  metaMDS analysis and plots in VEGAN. Compare output with the species-level work done previously. What's similar? What's different? 
+
+```{r}
+ten<-read_csv("TenListsMatrix_fn5.csv")
+ten
+```

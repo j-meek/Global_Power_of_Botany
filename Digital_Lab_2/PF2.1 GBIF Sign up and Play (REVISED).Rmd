@@ -1,0 +1,185 @@
+---
+title: "PF2.1 GBIF from Lab Session with revisions"
+output: html_notebook
+---
+
+This assignment introduces GBIF, a free and open-access tool for researching, managing or learning about nature. It stands for Global Biodiversity Information Facility.  
+
+Please visit www.gbif.org and read about it under "What is GBIF?" and then sign up for GBIF.
+
+Most of the assignment will be done in a browser, except for the last few steps. Those can be done inside of R, and it's a good idea to get started with R early. If you need help with R, go look for the document "Starting with R for early assignments" and follow the directions. 
+
+BROWSER-BASED WORK
++Visit gbif www.gbif.org
++Look for "Login" at the upper right; sign up. Your e-mail will receive a confirmation e-mail and you'll need to go and retrieve it and validate your account.
++Save yourself time and frustration later. If you haven't already done so, create a document for yourself now with all course-related usernames & password)
++Click on "occurrences" and enter the Latin binomial species name for your chosen a plant species, most obviously the one associated with your reading assignment.
++In the menu across the right-hand window, click on "map" to see the spatial distribution of occurrences. Make some notes about what you see. (It's likely that GBIF will flag some of the occurrences. Take a look at this error message and make some notes of why you think they matter, or any questions you have.) 
++Now open the "year" menu under "occurrences" and use the sliders to explore the distribution of observed occurrences during four time periods: prior to 1801, 1801-1900, 1901-2000, and 2001-present. Make some notes about how many occurrences are in each time period. Hit "clear" after you finish exploring time periods. 
++Now open the "publisher" menu under occurrences. Is the New York Botanical Garden one of the choices? If so, click. Make some notes about how many occurrences are from NYBG. Are there images available for them? 
+
+##R-Studio and R work
+
+If you were reading this on paper or in a browser, it's now time to open R-Studio and open the *.Rmd version of the notebook file.  
+
+You can re-save and re-name ("Sve As) and then you'll generate two new files: an R Notebooks that can runs in R studio (e.g., fn.Rmd) and another than can be opened in a word-processor browswer (e.g., fn.nb.html)\
+
+If you'd like, you can  open a new "untitled" file and type commands into it. You can open a untitled R Notebook, or an R script. Both will open in the script editor, the upper-left window in R Studio. 
+
+Either way, the next step is to install and load the package "rgbif" which allows you to access data records in GBIF and import them directly into R, where you can also map them. 
+```{r}
+#install.packages("rgbif")
+library("rgbif")
+```
+The command above gets the package from the on-line repository for R packages, CRAN. Don't be alarmed if the software asks to re-start R to install and load the package. That's okay. R-studio will auto-save any open files. 
+
+Also, if you return to work on this notebook later, then you want to add a # to the line about install.packages, because there is not need to re-install a package to R-Studio and R. The installation is permanent on your hard-drive. (You might need to re-install if you go to another computer.)
+
+Leave the code: library("rgbif")
+
+In fact, remembering to load a library after returning to R-Studio and R and a Notebook is extremely important. Typically you'll have a hard time running code that is related to a package if you have not re-loaded the package from your library. 
+
+There is another way to get packages that are more cutting-edge and in-progress, which is to go to GitHub and get them directly from the people who are developing the package. You can try that using the code below:
+```{r}
+#devtools::install_github("ropensci/rgbif")
+### Then of course you need to open the package from your library of installed packages. 
+library("rgbif")
+```
+Again, if you use this alternative, then add a # to the line that starts with devtools:: (because you don't need to continually re-install each time you re-open a notebook to work on it.)
+
+The lower right-hand window in R Studio offters yet another way to manage installing, updating, and managing the library of packages. Checked libraries are loaded, and can be un-checked to remove them.
+
+#### Trying some commands to access data in GBIF
+
+Try the commands below. Both are occurrence searches, both on scientific name. What is the difference? 
+If you're using this as a notebook, just press the "play triangle" icon and the code will run automatically. Or, if you prefer to read it in a browser or word processor, then copy/paste from there into the script editor for R and then run. 
+
+First try the scripts by just using the names there. The first script is using the command "occ_search" to look for the first 1500 occurrences of a species, sweetgrass (Hierochloe odorata) or breadfruit (Artocarpus altilis). The second chunk of code is looking for plants in just the genus Hierochloe or Artocarpus.
+
+```{r}
+Hiero_odor<-occ_search(scientificName = "Hierochloe odorata", limit = 1500)
+names(Hiero_odor)
+colnames(Hiero_odor$data)
+```
+
+
+```{r}
+Arto_alt<-occ_search(scientificName = "Artocarpus altilis", limit = 1500)
+names(Arto_alt)
+colnames(Arto_alt$data)
+```
+
+```{r}
+Arto<-occ_search(scientificName = "Artocarpus", limit = 1500)
+names(Arto)
+colnames(Arto$data)
+# We can check to make sure they're all the right genus
+unique(Arto$data$genus)
+## [1] "Arto"
+# Okay, what if we want to look at a list of species names?
+unique(Arto$data$species)
+```
+
+```{r}
+# Let's make a subset and turn it into an R data frame with just a few of the bits we need
+Arto.small <- subset(Arto$data, select = c("species", "decimalLatitude", 
+                                         "decimalLongitude"))
+Arto.small <- as.data.frame(Arto.small)
+head(Arto.small)
+colnames(Arto.small)  <- c("species", "lat", "lon")
+```
+
+```{r}
+# But wait!  Do we have NAs?
+Arto.small
+```
+
+
+```{r}
+# Since we do, let's slim down the data set to just complete cases
+Arto.small <- Arto.small[complete.cases(Arto.small),]
+dim(Arto.small)
+Arto.small
+```
+
+
+```{r}
+# We also may have some duplicate observations (same species in exact same place.
+# This could be a problem for certain modeling activities. 
+# If we wanted to get rid of them, we could use this one-line command.
+# The second line shows what it does compared to the previous version of the command (above).
+Arto.small <- unique(Arto.small)
+dim(Arto.small)
+head(Arto.small)
+```
+
+
+As a follow-up exercise, try everything again. This time, you can re-type (or copy and paste) the chunks of R code above. Then replace/edit by substituting new names for a new plant genus that you'd like to focus on. 
+
+Above, as I created new versions of the originally downloaded file (Arto), I recycled the filename. You can do this, or you could create a series of related file names. 
+
+In editing code, note that it often includes parentheses or quotation marks. If they are there, they needed to be there for R to understand. So, pay attention to them. 
+
+Also, as you hit the "play" but to run commands: R console and tbl_df. Take a look at both and compare to what you could view inside GBIF when you were exploring in a browser. 
+
+
+If you browse both down and across the output generated above (in tbl_df), you'll see that you loaded only 20 records (scrolling down, each line) but many fields (scrowling to the right, each column). If you might be interested in fewer records, then you can use add the fields you want, as shown below. Again, the syntax must be exact: you need the "c" for concatenate which essentially glues together multiple columns into one data table, the parentheses, and the quotation marks. All are needed for R to understand. Or, again, if you're using this file as a notebook you can just press the "play triangle" icon and the code will run automatically.
+
+```{r}
+occ_search(scientificName = "Artocarpus altilis", fields=c('name','basisOfRecord','decimalLatitude', 'decimalLongitude', 'basisOfRecord', 'year'), limit = 20)
+```
+
+
+As requested, you have only twenty records and only the columns requested, but could change those commands to get more records from the GBIF database, and additional columns. 
+
+A nice feature of the "rgbif" package is that it can look up the species first to make sure it's the right one. (You can edit your query if it's not.) If the name is right, the command here has named it as "correct" and then the next line looks up that correct name and returns all its data. THe next line opens a plotting package. (Install the package if you need to. It's called "ggplot2"; then open the library). The plotting package draws a complete world map by default. 
+
+In two weeks, we'll learn to use this in more detail, such as country by country or state by state.We will also learn some other packages like "dismo"   
+
+Now let's try mapping for sweetgrass, which is tricky to name because there are two different scientific names associated with it. (And the two are synonyms; they refer to the same species.)
+
+```{r}
+correct <- name_suggest(q='Hierochloe odorata', rank='species')$key[1]
+data1 <- occ_search(taxonKey=correct, return = 'data', limit=2000)
+data1
+library("ggplot2")
+gbifmap(data1)
+```
+
+```{r}
+correct <- name_suggest(q='Anthoxanthum nitens', rank='species')$key[1]
+data2 <- occ_search(taxonKey=correct, return = 'data', limit=200)
+data2
+gbifmap(data2)
+```
+
+
+## To Complete This Notebook for Your Portfolio
+
+
+The best way to complete the R part of the assignment is to edit the chunks of code for the same species of interest explored in the browser-oriented assignments. (You may have previously looked up your species in the C.V. Starr Virtual Herbarium at NYBG and the I-DigBio resource.) 
+
+You can also get more data by changing the limit:  400, 1000, 2000 or a larger number. It's not necessary, but try it. You can save a copy of this notebook under a new name and it will save your R output. You can then open it in Word and add any notes from the browser-based part.  
+
+
+Beyond the species or genus tried during class, what other species could you try? 
+
+One place to go is previous readings, but you can also try other species that interest you. 
+
+#### Braiding Sweetgrass: 
+
++Wild Rice = genus Zizania; species are Z. aquatica, Z. palustris, Z. texana
+                    and native to Asia - Z. latifolia
+
+#### Tomatoland
++wild relatives such as Solanum cheesmaniae, S. chmielewskii
+
+#### Discovery of Jeanne Baret
++ Bougainvillea spectabilis
+
+#### The Wild Trees
++coastal redwood = Sequoia sempervirens
++Dawn redwood = Metasequoia glyptostroboides
+
+#### Where Does Our Food Come from
++wild apple relatives = Malus doumeri

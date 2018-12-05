@@ -1,0 +1,334 @@
+---
+title: "PF3.2a: To Make & Work with Trees - from Phylomatic to PhyloT & ROTL"
+output: html_notebook
+---
+
+This is a follow-up . . . aiming to streamline the possibility of creating a phylogenies based on plant taxa from the succulent room in Ross Greenhouse. 
+
+If you plan to work through this assignment, it makes sense to rename this R Notebook to use it as a place to document your work, so that it is reproducible and to turn it in as a completed Portfolio  assignment (PF 3.2a) 
+
+## Review of APE and BRRANCHING
+
+Our digital lab sessions and a previous R Notebook introduced the R packages APE and BRRANCHING, A strength of BRRANCHING is that it can access the on-line resource Phylomatic, a reference phylogeny for angiosperms. 
+
+```{r}
+library('ape')
+library('brranching')
+```
+
+
+Lists of angiosperm taxa (species, genera, families) can be used to download a Phylomatic phylogeny into R, where it can be visualized. Below is a previous example, using the level of genus. 
+
+Such a file can be exported from R software in Newick  of Nexus format, and that file can be imported into other programs such as FigTree. 
+
+```{r}
+taxa<-c("Punica", "Theobroma", "Neomarica", "Aechmea", "Solandra", "Grevillea", "Jasminum", "Tibouchina", "Amorphophallus", "Saccharum")
+tree_phylomatic <- phylomatic(taxa = taxa, get = 'POST')
+plot(tree_phylomatic, no.margin = TRUE)
+taxa
+nexus_fn = "tree_phylomatic"
+write.tree(tree_phylomatic, file=nexus_fn)
+```
+
+
+
+
+
+## Accessing Phylomatic through a browser
+
+In addition to accessing Phylomatic through the package branching, it's also possible to access it directly in a browser: http://phylodiversity.net/phylomatic/ and you should review and further familiarize yourself with Phylomatic. (As appropriate, add some annotations to this notebook to summarize what you've learned and done.)
+
+In Phylomatic's browser interface, you need to select a stored tree from the pull-down menu, which could be the Phylomatic tree (R20120829) or you could try using slik2015 and zanne2014. Personally, I was impressed by the zanne2014. Check it out. Can you discern the strengths of this reference phylogeny? You might want to read a paper about how its been updated, by Qian & Jin 2016 J Pl Ecol 9(2):233-239 (http://dx.doi.org/10.1093/jpe/rtv047)
+
+To enter your list of taxa, the list used above within R requires modification to use directly in Phylomatic's web-based interface, which requires "slashpath" format and inclusion of families. 
+
+lythraceae/Punica
+malvaceae/Theobroma
+iridaceae/Neomarica
+bromeliaceae/Aechmea
+solanaceae/Solandra
+proteaceae/Grevillea
+oleaceae/Jasminum
+melastomataceae/Tibouchina
+araceae/Amorphophallus
+poaceae/Saccharum
+
+Under "outformat" the default output, Newick, is what you want. 
+
+## Different stored trees in BRRANCHING -- details of the command tree_phylomatic
+
+What if you wanted to access the slik2015 or zanne2014 tree when working in R, it's fairly straightforward. Simply add an argument to the command above:
+
+```{r}
+taxa<-c("Punica", "Theobroma", "Neomarica", "Aechmea", "Solandra", "Grevillea", "Jasminum", "Tibouchina", "Amorphophallus", "Saccharum")
+tree_R20120829 <- phylomatic(taxa = taxa, get = 'POST')
+tree_zanne2014 <- phylomatic(taxa = taxa, storedtree ="zanne2014", get = 'POST')
+plot(tree_R20120829, no.margin = TRUE)
+plot(tree_zanne2014, no.margin = TRUE)
+
+default_fn = "tree_phylomatic_R20120829"
+write.tree(tree_R20120829, file=default_fn)
+
+default_fn = "tree_phylomatic_zanne2014"
+write.tree(tree_zanne2014, file=default_fn)
+
+```
+How do these two trees compare? Do they show the same relationships among taxa and clades? Is something else different? (Hint: compare lengths of branches within and between trees.)
+
+## Another resource: PhyloT
+
+Next, visit  "PhyloT" and consider how it is similar to and different from Phylomatic? (You may want to add some annotations into this notebook.)
+
+http://phylot.biobyte.de/ 
+
+PhyloT lets you enter just genera (or species binomials), one per line, with a comma on the end of each line
+
+Punica, 
+Theobroma, 
+Neomarica, 
+Aechmea, 
+Solandra, 
+Grevillea, 
+Jasminum,
+Tibouchina, 
+Amorphophallus,
+Saccharum
+
+You then have two options. 
+
+One option is "generate tree" which will download a Newick-formatted file  to your computer. You could then put this into your working directory, and open it and work with it and plot it within R, as in the chunk of code below that uses a dummy file name.
+
+```{r}
+tree_PhyloT<-read.tree(file="file_name.txt")
+tree_PhyloT
+plot(tree_PhyloT)
+```
+
+You could also open such a tree file in FigTree. 
+
+The other option is "Visualize in iTOL" which opens the tree in "Interactive Tree of Life." From there, you could  export a Newick file (openable elsewhere), but that just creates an extra stip since PhyloT can do this directly. 
+
+Incidentally, Interactive Tree of Life is somewhat like FigTree. It is an interactive program in which, with persistence, you can learn to annotate the tree in a variety of ways: 
+
+- display as normal phylogeny, circular, or unrooted
+- point and click on tips, nodes or edges (and modify as desired in terms of color-coding, weight)
+- rotate or collapse branches
+etc.
+
+You might want to further explore interactive Tree of Life in the PF3.3 assignment about Visualizing phylogenies. 
+
+## Open Tree of Life and the ROTL Package
+
+Another tool to be introduced in this R Notebook is Open Tree of Life, below
+
+https://tree.opentreeoflife.org/opentree/argus/opentree9.1@ott93302
+
+Open Tree of Life can be used in connection with an R OpenScience package, RTOL. 
+
+The first thing to do is to install the package ROTL (uncomment to do so, then re-comment it.) Alwaysremember to re-load the package from your library if you are returning to work at a later and separate session in R Studio
+
+
+```{r}
+#install.packages("rotl")
+library("rotl")
+#vignette("how-to-use-rotl", package="rotl")
+```
+
+This notebook reproduces material from vignette("how-to-user-rotl") and extends it with some plant examples. 
+
+## Background: What is ROTL?
+
+rotl is one among many tools within R OpenScience
+
+https://ropensci.org/
+
+rotl provides an interface to the Open Tree of Life (OTL) API and allows users to query the API, retrieve parts of the Tree of Life and integrate these parts with other R packages.
+
+The OTL API provides services to access to the Tree of Life, which uses a system for naming and identifying taxa called OTT (for Open Tree Taxonomy). If you have names of species (or general, or families) then you can query for the OTT directly using features of ROTL, as below.
+
++ the Tree of Life a.k.a. TOL (the synthetic tree): a single draft tree that is a combination of the OTL taxonomy and the source trees (studies) . . . these features begin with the prefix tol_
+
++ the Taxonomic name resolution services a.k.a. TNRS: the methods for resolving taxonomic names to the internal identifiers used by the TOL and the GOL (the ott ids) . . . these features begin with the prefix tnrs_
+
++ the Taxonomy a.k.a. OTT (for Open Tree Taxonomy): which represents the synthesis of the different taxonomies used as a backbone of the TOL when no studies are available . . . these features begin with the prefix taxonomy_
+
++ the Studies containing the source trees used to build the TOL, and extracted from the scientific literature . . . these features begin with the prefix studies_
+
+rotl also provides a few other functions and methods that can be used to extract relevant information from the objects returned by these functions. You can activate a vignette that will appear in the lower right window of R studio if you use the command \
+
+```{r}
+vignette("how-to-use-rotl", package="rotl")
+```
+
+## Demonstration of a basic workflow
+
+The most common use for rotl is  to start from a list of species and get the relevant parts of the tree for these species. This is a two step process:
+
+1. The species names need to be matched to their ott_id (the Open Tree Taxonomy identifiers) using the Taxonomic name resolution services (TNRS)
+2. These ott_id will then be used to retrieve the relevant parts of the Tree of Life.
+
+#### Step 1: Matching taxonomy to the ott_id
+
+Let's start by doing a search on a diverse group of taxa: a tree frog (genus Hyla), a fish (genus Salmo), a sea urchin (genus Diadema), and a nautilus (genus Nautilus).
+
+```{r}
+#library(rotl)
+taxa <- c("Hyla", "Salmo", "Diadema", "Nautilus")
+resolved_names <- tnrs_match_names(taxa)
+resolved_names
+```
+
+It's always a good idea to check that the resolved names match what you intended:
+
+The column unique_name sometimes indicates the higher taxonomic level associated with the name. So, for example, these are four animals identified by genus name. Hyla, Salmo, Diadema and Nautilus are all generic names, but for the genus Diadema the OTT ID being returned is for Nucletmycea, which is a fungus. 
+
+The intention here is to search for the sea urchin Diadema. 
+
+It's possible to add an argument to the command to limit the taxonomic scope of your search. 
+To ensure that our search is limited to animal names, we could do:
+
+
+```{r}
+#library(rotl)
+taxa <- c("Hyla", "Salmo", "Diadema", "Nautilus")
+resolved_names <- tnrs_match_names(taxa, context_name = "Animals")
+resolved_names
+```
+
+
+
+If you want to see the list of groups that can be used to limit a search, you can try the command below:
+
+```{r}
+tnrs_contexts()
+```
+
+If you are trying to build a tree with deeply divergent taxa that the argument context_name cannot fix, see "How to change the ott ids assigned to my taxa?" in the RTOL Vignette.
+
+Let's try a list of plant taxa, Ptaxa:
+
+```{r}
+Ptaxa <- c("Abies",
+"Ailanthus",
+"Begonia",
+"Berberis",
+"Betula",
+"Chenopodium",
+"Clematis",
+"Dahlia",
+"Dracaena",
+"Equisetum",
+"Euonymus",
+"Euphorbia",
+"Fagus")
+P_resolved_names <- tnrs_match_names(Ptaxa, context_name = "Land plants")
+in_tree <- is_in_tree(ott_id(P_resolved_names))
+in_tree
+```
+
+
+#### Step 2: Getting the tree corresponding to a list of taxa
+
+Now that we have the correct ott_id for a list of taxa, we can ask for the tree using the tol_induced_subtree() function. By default, the object returned by tol_induced_subtree is a phylo object (from the ape package), so we can plot it directly.
+
+
+```{r}
+my_tree <- tol_induced_subtree(ott_ids = resolved_names$ott_id)
+plot(my_tree, no.margin=TRUE)
+
+```
+
+#### Find a OTT taxon in another taxonomic database
+
+It is also possible map an Open Tree taxon to a record in another taxonomic database. 
+
+For instance, if we wanted to search for data about one or more of the tips of the animal tree in the example above we could do so using taxon_external_IDs:
+
+```{r}
+Tt_id1 <- taxon_external_IDs(resolved_names$ott_id[1])
+Tt_id3 <- taxon_external_IDs(resolved_names$ott_id[3])
+Tt_id1
+Tt_id3
+```
+
+A user could then use, say, rgbif to find locality records using the gbif ID. 
+
+
+
+#### MINI-EXERCISE
+
+1 What does our list of plants from above look like on a phylogenetic tree? Remember that we assigned as P_resolved_names for the output when we resolved our list of plant genera: "Abies", "Ailanthus", "Begonia", "Berberis", "Betula", "Chenopodium", "Clematis", "Dahlia", "Dracaena", "Equisetum", "Euonymus", "Euphorbia", "Fagus"
+
++ Modify the code that generated the four-taxon animal phylogeny, putting it into the blank chunk of code below. Then run the code to obtain the output (a phylogeny from Open Tree of Life).
+
+
+```{r}
+
+```
+
+2. Now develop your own lists of plants to resolve and phylogenize. Aim to have 8--20 plant species. 
+a. To get common names resolved into scientific names, so try itis.gov and/or theplantlist.org.
+
+b. It's fine to work at the level of genus. Get your genus list and generate a phylogeny from Phylomatic, using BRRANCHING. 
+
+c. Resolve the list of plant genera into OTT IDs from the Open Tree of Life, using ROTL. 
+
+d. Get a phylogeny from OTT.
+
+Stuck for ideas? 
+
+What are some medicinal plants that you're aware of?
+
+What plants are favorites of honeybees?
+hives?
+
+http://www.maine.gov/dacf/php/pesticides/yardscaping/documents/Top%20Bee%20Forage%20Plants%20for%20Maine.pdf
+
+Consider using foods that you've eaten in the past 24 hours, and perhaps check out this interesting article about how there is a strong bias in edible plants, with relatively few taxa represented in comparison to all plant taxa that exist worldwide. 
+https://academic.oup.com/bioscience/article-abstract/58/2/151/259911
+
+Another option might be the tree species that grow on a street you traveled earlier today or yesterday, or the most common street trees planted in NYC
+
+
+https://www.nycgovparks.org/trees/tree-census/2005-2006
+
+
+
+#### More Information - the ROTL Vignette and FAQ
+
+To look into some other issues, open the vignette for ROTL (which will appear in the viewer in the lower right of R Studio.) There is an FAQ to help with issues such as mismatches between the taxa requested and the taxa and OTT IDs returned, or for checking to ensure that the taxa being requested is correct. 
+
+```{r}
+vignette("how-to-use-rotl", package="rotl")
+```
+
+
+#### What about getting a tree for an entire taxonomic group, or from a published paper
+
+
+It is possible to get trees for entire taxonomic groups as they exist inside of OTOL, but this may be a bit overwhelming for highly diverse plant groups. 
+
+
+```{r}
+illicium_id <- tnrs_match_names("Illiciaceae")
+illicium_tree <- tol_subtree(ott_id = ott_id(illicium_id))
+plot(illicium_tree, type = "fan")
+```
+
+Another option might be to use the package TREEBASE to access the data repository TREEBASE, where authors archive data from publications about phylogenetics. https://treebase.org/treebase-web/home.html
+
+
+
+#### And Beyond!
+
+This demonstration and tutorial reviewed Phylomatic, introduced PhyloT and the interactive Tree of Life (iToL), not to be confused with Open Tree of Life (OTOL) and the R package ROTL for accessing the latter. 
+
+This is just a start. Even if you're not an evolutionary systematist wanting to infer a complete phylogeny to improve the systematics of a taxon of plants, there's a lot more you do with this sort of data in R. 
+
+You could gather more data on your species using packages that connect to trait databases like BIEN. 
+Or perhaps unite exploration of species co-occurrence using not only VEGAN but also the package PICANTE, which can assess whether or not there is phylogenetic signal in the community composition and community assembly (co-existing species in the community). A central question in this area is whether closely related species more likely or less likely to co-exist within a community? On the one hand, related species may be phenotypically similar and more likely to co-occur. On the other hand, related species that are phenotypically similar may compete strongly, with the a superior competitior excluding inferior competitors. 
+
+Lots of food for thought!
+
+
+

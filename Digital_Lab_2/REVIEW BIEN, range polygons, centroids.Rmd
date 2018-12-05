@@ -1,0 +1,53 @@
+---
+title: "R BIEN Package: Review of Species Occurrences, Ranges, Plus finding centroids"
+output: html_notebook
+---
+
+Load libraries -- tools for accessing BIEN and downloading various types of data, packages relating to maps and spatial data:
+
+```{r}
+library(BIEN)
+library(maps)
+library(maptools)
+library(sp)
+library(rgeos)
+
+```
+
+
+Quick review of something you probably already know well: accessing BIEN for species occurrence data and range data, and plotting it
+
+```{r}
+Maclura_pomifera_occ <- BIEN_occurrence_species(species = "Maclura pomifera")
+Maclura_pomifera_occ
+Maclura_pomifera_range <- BIEN_ranges_load_species(species = "Maclura pomifera")
+map('world',fill=T , col= "grey", bg="light blue",xlim = c(-180,-20),ylim = c(-60,80))
+#Now, we can add the range map:
+plot(Maclura_pomifera_range,col="green",add=T)
+points(cbind(Maclura_pomifera_occ$longitude,Maclura_pomifera_occ$latitude),col="red",pch=20,cex=1) 
+
+```
+
+
+I can understand that multiple range and occurrence maps will turn into a muddle. 
+
+I do encourage you to visit ERC and if you can meet with Fatima, my understanding is that she is well versed in using R for spatial data in addition to knowing GIS. 
+
+One option might be to use/plot centroids rather than polygons. You can calculate them in the package rgeos (already loaded in library above), with a function that can calculate the centroid of any spatial polygon, such as a range downloaded from BIEN
+
+```{r}
+centr<-gCentroid(Maclura_pomifera_range, byid = T)
+centr
+```
+
+You need to modify the code used above for plotting points, because the object returned using gCentroid function uses "x" and "y" to label the values of latitude and longitude. 
+
+There is also a reference for graphical parameters that may help you change the size and/or color of these dots if you want to do something like indicate species, or use bigger dots for the top ten species, smaller dots for the next ten, etc. 
+
+```{r}
+map('world',fill=T , col= "grey", bg="light blue",xlim = c(-180,-20),ylim = c(-60,80))
+#Now, we can add the range map:
+#plot(Maclura_pomifera_range,col="green",add=T)
+points(cbind(centr$x,centr$y),col="red",pch=20,cex=1) 
+# more graphical parameters here: https://www.statmethods.net/advgraphs/parameters.html
+```
