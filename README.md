@@ -1,8 +1,9 @@
-# Global_Power_of_Botany
-### This is an overview of the programming resources you will need for the Spring 2019 Global Power of Botany course at Barnard College.
+# Global Power of Botany
+This is an overview of the programming resources you will need for the Spring 2019 Global Power of Botany course at Barnard College.
 
-## Getting Started with R
+## Getting Started with...
 
+### R
 Install R from https://cran.r-project.org/
 Download RStudio Desktrop (FREE) from https://www.rstudio.com/products/rstudio/download/#download
 
@@ -16,7 +17,7 @@ and explore these tutorials within RStudio.
 
 For a great introduction to RStudio, go here. Whether or not you’re new to RStudio, this guide gives you a great sense of the shortcuts and options you have to help with your assignments.
 
-## GitHub: Getting Started
+### GitHub
 
 Creating readable code and collaborating with others is an important programming skill. GitHub is a popular, free, open-source site that helps you keep track of different versions of files and share them with collaborators (fellow students, colleagues, etc). You will need to create a GitHub account for this class as most coding assignments will be submitted in this way.
 
@@ -27,7 +28,7 @@ Finally, for a relatively quick and comprehensive tutorial about git (the progra
 
 If you’re interested in learning more about git and GitHub, read the online Git Pro book or go to https://guides.github.com/.
 
-## Markdown
+### Markdown
 
 Markdown is a simple text editor language that we will use to format our code-based assignments for this class. For a simple introduction, follow this tutorial:
 https://www.markdowntutorial.com/
