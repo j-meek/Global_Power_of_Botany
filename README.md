@@ -11,8 +11,10 @@ There are an overwhelming number of online tutorials for people new to the R pro
 <here> or <here> for the basics.
 
 Alternatively, type these commands in your RStudio Console:
-install.packages(“swirl”)
-library(swirl)
+
+> install.packages(“swirl”)
+> library(swirl)
+
 and explore these tutorials within RStudio.
 
 For a great introduction to RStudio, go here. Whether or not you’re new to RStudio, this guide gives you a great sense of the shortcuts and options you have to help with your assignments.
