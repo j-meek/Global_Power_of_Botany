@@ -1,0 +1,52 @@
+---
+title: "Introducing R, RStudio and R Notebook files"
+output: html_notebook
+---
+
+Welcome to your first experience (in this class) with an [R Markdown](http://rmarkdown.rstudio.com) Notebook. 
+
+R is a programming language designed for data analysis and statistics. It can be used for basic statistics and biostatistics such as:
+
+1. calculating means and standard deviations for one or more variables in a data set
+
+2. visualizing data in many formats (bar graphs, box plots, pie charts, scatter plots, etc)
+
+3. Devising and "fitting" statistical models from something as simple as a linear regression between a dependent variable (y) and an independent variable (x) to much fancier models that take into account geo-spatial or phylogenetic relationships
+
+
+R has several big advantages:
+
+1. It is open source, meaning that the people who develop it share it for free and are involved in developing it further based on user experiences
+
+2. It is popular and democratic, partly because it is free and open source
+
+3. It is (relatively) easy.
+
+You may be skeptical of advantage #3, but R is one of the easier programming languages to learn. All of them are daunting at the beginning and easier over time. Moreover, learning one language will help you learn other languages. 
+
+A main reason why R is considered "easy" is because most of the "computer science details" (representing numbers and objects at binary bits and bytes; memory management) are handled behind the scenes. This makes R a little slower than some languages, but that usually is not a big concern unless one is working with whole-planet or whole-genome data sets. We won't do that (yet)!
+
+# Trying out your R Notebook
+
+An R Notebook is a way to write and run code. When you execute code within an R Notebook, the results appear beneath the code. 
+
+Sometimes this is referred to as a "chunk" of code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+plot(cars)
+```
+
+Wasn't that fun? The reason that worked so well is that RStudio has a "demo" dataset loaded. 
+
+What we'll do next is use some additional code that is pre-written, and then you can try adding some variations on that code. 
+
+In an R Notebook, you add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save an R Notebook, you save two files. One is a file in an R-compatible format and the other is a file compatible with both R and a web browser (an HTML file). 
+
+At the end of today's session (or when you're working later on a Portfolio assignment), you may want to re-name the file to re-save a version that includes added work, which will be of two types:
+(1) new chunks that you've written and honed
+(2) output that you produce when you're happy with your chunk of code and want to show the wonderful output that it generates. 
+
