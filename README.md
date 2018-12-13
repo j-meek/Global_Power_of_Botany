@@ -13,6 +13,7 @@ There are an overwhelming number of online tutorials for people new to the R pro
 Alternatively, type these commands in your RStudio Console:
 
 > install.packages(“swirl”)
+
 > library(swirl)
 
 and explore these tutorials within RStudio.
